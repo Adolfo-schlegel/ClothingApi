@@ -108,7 +108,7 @@ func CreateClient(c *gin.Context) {
 	client.ID = primitive.NewObjectID()
 
 	//Insert the client into the database
-	result, err := Collection.InsertOne(c, client)
+	_, err := Collection.InsertOne(c, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
