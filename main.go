@@ -1,7 +1,10 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
+
 	MongoDB "example/src/DB/MongoDB"
+
 	Client "example/src/handlers"
 	"fmt"
 	"log"
@@ -34,6 +37,19 @@ func main() {
 	router := gin.Default()
 	print("Router\n")
 
+	//router.Use(cors.New(cors.Config{
+	//	AllowOrigins:     []string{"https://foo.com"},
+	//	AllowMethods:     []string{"PUT", "PATCH"},
+	//	AllowHeaders:     []string{"Origin"},
+	//	ExposeHeaders:    []string{"Content-Length"},
+	//	AllowCredentials: true,
+	//	AllowOriginFunc: func(origin string) bool {
+	//		return origin == "https://github.com"
+	//	},
+	//	MaxAge: 12 * time.Hour,
+	//}))
+
+	router.Use(cors.Default())
 	//Client
 	router.GET("/clients/:id", Client.GetclientById)
 	router.POST("/clients/:id", Client.UpdateClient)
