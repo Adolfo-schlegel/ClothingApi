@@ -11,4 +11,5 @@ type Client struct {
 	State    bool               `json:"state"`
 	Image    string             `json:"image"`
 	Rating   int                `json:"rating"`
+	Type     string             `json:"type"`
 }
