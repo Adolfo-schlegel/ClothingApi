@@ -1,4 +1,4 @@
-package Client
+package BasicClient
 
 import (
 	Model "example/src/Models"
@@ -12,11 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var Collection *mongo.Collection = nil
-
-func main() {
-
-}
+var ClientCol *mongo.Collection = nil
+var ParcialCol *mongo.Collection = nil
 
 func GetclientById(c *gin.Context) {
 	client, err := findClient(c.Param("id"), c)
@@ -41,11 +38,7 @@ func findClient(clientId string, c *gin.Context) (*Model.Client, error) {
 
 	filter := bson.D{{"id", id}}
 
-	err = Collection.FindOne(c.Request.Context(), filter).Decode(&result)
-
-	if err != nil {
-		return nil, err
-	}
+	err = ClientCol.FindOne(c.Request.Context(), filter).Decode(&result)
 
 	if err != nil {
 		return nil, err
@@ -69,7 +62,7 @@ func intToHexObjectID(value int) (primitive.ObjectID, error) {
 
 func GetClients(c *gin.Context) {
 	//Find all
-	cursor, err := Collection.Find(c, bson.M{})
+	cursor, err := ClientCol.Find(c, bson.M{})
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"\nmessage": "Error parsing JSON", "code": http.StatusInternalServerError})
@@ -104,15 +97,37 @@ func CreateClient(c *gin.Context) {
 	}
 
 	// Set a new ObjectID for the client
-
 	client.ID = primitive.NewObjectID()
 
 	//Insert the client into the database
-	_, err := Collection.InsertOne(c, client)
+	_, err := ClientCol.InsertOne(c, client)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Error al insertar Usuario en la base de datos " + err.Error()})
 		return
+	}
+
+	if client.Type == "Parcial" {
+		var parcial Model.ParcialClient
+
+		// Setting default partial client
+		parcial.ID = primitive.NewObjectID()
+		parcial.IdClient = client.ID.Hex()
+		parcial.Clothes = nil
+
+		//Insert the partial client into the database
+		_, err := ParcialCol.InsertOne(c, parcial)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "No se pudo crear cliente parcial " + err.Error()})
+			return
+		}
+
+	} else if client.Type == "Integral" {
+		//Insertar Integral
+
+	} else if client.Type == "Nuevo" {
+		//??
 	}
 
 	//fijarse que onda con el id insertado
@@ -127,7 +142,7 @@ func DeleteById(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 	}
 
-	result, err := Collection.DeleteOne(c, bson.M{"id": objectId})
+	result, err := ClientCol.DeleteOne(c, bson.M{"id": objectId})
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
@@ -164,7 +179,7 @@ func ChangeRating(c *gin.Context) {
 	filter := bson.D{{"id", client.ID}}
 	update := bson.M{"$set": client}
 
-	result, err := Collection.UpdateOne(c, filter, update)
+	result, err := ClientCol.UpdateOne(c, filter, update)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
@@ -190,7 +205,7 @@ func UpdateClient(c *gin.Context) {
 	filter := bson.D{{"id", objectId}}
 	update := bson.M{"$set": client}
 
-	result, err := Collection.UpdateOne(c, filter, update)
+	result, err := ClientCol.UpdateOne(c, filter, update)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
