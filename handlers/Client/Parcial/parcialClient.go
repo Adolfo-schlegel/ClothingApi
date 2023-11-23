@@ -41,7 +41,7 @@ func GetPartialById(c *gin.Context) {
 	client, err := findPartial(c.Param("id"), c)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"\nmessage": "Client not found." + err.Error()})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"\nmessage": "Client not found " + err.Error()})
 		return
 	}
 
@@ -65,6 +65,7 @@ func findPartial(clientId string, c *gin.Context) (*Model.ParcialClient, error) 
 	if err != nil {
 		return nil, err
 	}
+
 	return &result, nil
 }
 
