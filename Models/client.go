@@ -17,7 +17,7 @@ type Client struct {
 type ParcialClient struct {
 	ID       primitive.ObjectID `json:"_id" bson:"_id"`
 	IdClient string             `json:"idClient" bson:"idClient"`
-	Clothes  []Clothe           `json:"clothes" bson:"clothes"`
+	Clothes  *[]Clothe          `json:"clothes,omitempty" bson:"clothes,omitempty"`
 }
 
 type Clothe struct {

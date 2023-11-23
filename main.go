@@ -2,9 +2,6 @@ package main
 
 import (
 	"os"
-	"time"
-
-	"github.com/gin-contrib/cors"
 
 	MongoDB "example/src/DB/MongoDB"
 	BasicClient "example/src/handlers/Client/Basic"
@@ -57,10 +54,25 @@ func init() {
 	verifyOutput()
 	ConfigMongoConnection()
 }
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
 func main() {
 	host := "localhost:9990"
 	router := gin.Default()
+	router.Use(CORSMiddleware())
 	print("Router\n")
 
 	// Crear un grupo de rutas con el prefijo /api/go
@@ -82,17 +94,19 @@ func main() {
 	//--------------------------------------------Middleware ----------------------------------------------------------------
 	//router.Use(cors.Default())
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		AllowOriginFunc: func(origin string) bool {
-			return true
-		},
-		MaxAge: 12 * time.Hour,
-	}))
+	//HeaderDisallowedByPreflightResponse
+	//router.Use(cors.New(cors.Config{
+	//	AllowOrigins:     []string{"*"},
+	//	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+	//	AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Accept", "Authorization"},
+	//	ExposeHeaders:    []string{"Content-Length"},
+	//	AllowCredentials: true,
+	//	AllowOriginFunc: func(origin string) bool {
+	//		return true
+	//	},
+	//	MaxAge: 12 * time.Hour,
+	//}))
+
 	//----------------------------------------------------------------------------------------------------------------------------
 
 	//Basic Client Info
