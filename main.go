@@ -91,24 +91,6 @@ func main() {
 		c.String(200, "Healthy")
 	})
 
-	//--------------------------------------------Middleware ----------------------------------------------------------------
-	//router.Use(cors.Default())
-
-	//HeaderDisallowedByPreflightResponse
-	//router.Use(cors.New(cors.Config{
-	//	AllowOrigins:     []string{"*"},
-	//	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-	//	AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Accept", "Authorization"},
-	//	ExposeHeaders:    []string{"Content-Length"},
-	//	AllowCredentials: true,
-	//	AllowOriginFunc: func(origin string) bool {
-	//		return true
-	//	},
-	//	MaxAge: 12 * time.Hour,
-	//}))
-
-	//----------------------------------------------------------------------------------------------------------------------------
-
 	//Basic Client Info
 	goGroup.GET("/clients", BasicClient.GetClients)
 	goGroup.POST("/clients", BasicClient.CreateClient)
@@ -121,6 +103,6 @@ func main() {
 	goGroup.GET("/parcials", ParcialClient.GetPartials)
 	goGroup.GET("/parcials/find/:id", ParcialClient.GetPartialById)
 	goGroup.POST("/parcials", ParcialClient.CreateParcial)
-
+	goGroup.DELETE("/parcials/:id", ParcialClient.DeleteById)
 	router.Run(host)
 }

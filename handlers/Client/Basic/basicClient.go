@@ -96,7 +96,7 @@ func CreateClient(c *gin.Context) {
 		return
 	}
 
-	// Set a new ObjectID for the client
+	// Set a new ObjectID for the default client
 	client.ID = primitive.NewObjectID()
 
 	//Insert the client into the database
@@ -112,8 +112,8 @@ func CreateClient(c *gin.Context) {
 
 		// Setting default partial client
 		parcial.ID = primitive.NewObjectID()
-		parcial.IdClient = client.ID.Hex()
-		parcial.Clothes = &[]Model.Clothe{}
+		parcial.IdClient = client.ID
+		parcial.Clothes = nil
 
 		//Insert the partial client into the database
 		_, err := ParcialCol.InsertOne(c, parcial)

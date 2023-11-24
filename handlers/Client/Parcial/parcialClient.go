@@ -51,7 +51,6 @@ func GetPartialById(c *gin.Context) {
 func findPartial(clientId string, c *gin.Context) (*Model.ParcialClient, error) {
 	var result Model.ParcialClient
 
-	// Create a primitive.ObjectID from a hexadecimal string
 	id, err := primitive.ObjectIDFromHex(clientId)
 
 	if err != nil {
@@ -94,4 +93,20 @@ func CreateParcial(c *gin.Context) {
 	//Al crearse devuelve el _id y no el id
 
 	c.IndentedJSON(http.StatusCreated, 1)
+}
+func DeleteById(c *gin.Context) {
+
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Error al parsear id " + err.Error()})
+
+	}
+	result, err := Collection.DeleteOne(c, bson.M{"idClient": id})
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
+	}
+
+	c.IndentedJSON(http.StatusOK, result.DeletedCount)
 }
