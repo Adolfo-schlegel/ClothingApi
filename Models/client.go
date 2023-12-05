@@ -21,12 +21,13 @@ type ParcialClient struct {
 }
 
 type Clothe struct {
-	Date                  string `json:"date" bson:"date"`
-	Count                 string `json:"count"`
-	EmbroideryInstruction string `json:"embroideryInstruction"`
-	Descripcion           string `json:"descripcion"`
-	Cost                  int    `json:"cost"`
-	Color                 string `json:"color"`
+	ID                    primitive.ObjectID `json:"_id" bson:"_id"`
+	Date                  string             `json:"date" bson:"date"`
+	Count                 string             `json:"count" bson:"count"`
+	EmbroideryInstruction string             `json:"embroideryInstruction" bson:"embroideryInstruction"`
+	Descripcion           string             `json:"descripcion" bson:"descripcion"`
+	Cost                  int                `json:"cost" bson:"cost"`
+	Color                 string             `json:"color" bson:"color"`
 }
 
 type IntegralClient struct {

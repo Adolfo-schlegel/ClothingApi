@@ -104,5 +104,9 @@ func main() {
 	goGroup.GET("/parcials/find/:id", ParcialClient.GetPartialById)
 	goGroup.POST("/parcials", ParcialClient.CreateParcial)
 	goGroup.DELETE("/parcials/:id", ParcialClient.DeleteById)
+
+	goGroup.POST("/parcials/Box/:id", ParcialClient.CreateBox)
+	goGroup.DELETE("/parcials/Box", ParcialClient.DeleteBox)
+	goGroup.PUT("/parcials/Box", ParcialClient.Updatebox)
 	router.Run(host)
 }

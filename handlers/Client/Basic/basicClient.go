@@ -113,7 +113,7 @@ func CreateClient(c *gin.Context) {
 		// Setting default partial client
 		parcial.ID = primitive.NewObjectID()
 		parcial.IdClient = client.ID
-		parcial.Clothes = nil
+		parcial.Clothes = []Model.Clothe{}
 
 		//Insert the partial client into the database
 		_, err := ParcialCol.InsertOne(c, parcial)
