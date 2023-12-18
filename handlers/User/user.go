@@ -94,5 +94,13 @@ func Login(c *gin.Context) {
 }
 
 func Validate(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "i'm logged in"})
+
+	user, err := c.Get("user")
+
+	if err != true {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": user})
 }
