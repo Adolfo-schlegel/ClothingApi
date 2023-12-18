@@ -17,7 +17,7 @@ func CreateBox(c *gin.Context) {
 
 	}
 
-	var box Model.Clothe
+	var box Model.Box
 
 	//get the client from the json request
 	if err := c.ShouldBindJSON(&box); err != nil {
@@ -39,9 +39,87 @@ func CreateBox(c *gin.Context) {
 		return
 	}
 
-	//Al crearse devuelve el _id y no el id
+	c.IndentedJSON(http.StatusCreated, box.ID)
+}
+func AddImage(c *gin.Context) {
+	idcli, ok := c.GetQuery("idClient")
+	idObj, ok := c.GetQuery("id")
 
-	c.IndentedJSON(http.StatusCreated, 1)
+	if !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing id or rating query parameter."})
+	}
+
+	var image Model.Image
+
+	if err := c.ShouldBindJSON(&image); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body" + err.Error()})
+	}
+
+	idClient, err := primitive.ObjectIDFromHex(idcli)
+	id, err := primitive.ObjectIDFromHex(idObj)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Error al parsear id " + err.Error()})
+		return
+	}
+
+	// Define un filtro para el objeto que quieres eliminar.
+	filter := bson.M{
+		"idClient": idClient,
+		"clothes": bson.M{
+			"$elemMatch": bson.M{"_id": id},
+		},
+	}
+
+	// Update the document by adding the new item to the clothes array
+	update := bson.D{{"$push", bson.D{{"clothes.$.embroideryImages", image}}}}
+
+	//Update the document in the database
+	_, err = Collection.UpdateOne(c, filter, update)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
+		return
+	}
+
+}
+
+func DeleteImage(c *gin.Context) {
+	idcli, ok := c.GetQuery("idClient")
+	idObj, ok := c.GetQuery("id")
+	nameFile, ok := c.GetQuery("nameFile")
+
+	if !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing id or rating query parameter."})
+	}
+
+	idClient, err := primitive.ObjectIDFromHex(idcli)
+	id, err := primitive.ObjectIDFromHex(idObj)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Error al parsear id " + err.Error()})
+		return
+	}
+
+	// Define un filtro para el objeto que quieres eliminar.
+	filter := bson.M{
+		"idClient": idClient,
+		"clothes": bson.M{
+			"$elemMatch": bson.M{"_id": id},
+		},
+	}
+
+	// Update the document by adding the new item to the clothes array
+	update := bson.D{{"$pull", bson.D{{"clothes.$.embroideryImages", bson.D{{"name", nameFile}}}}}}
+
+	//Update the document in the database
+	_, err = Collection.UpdateOne(c, filter, update)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal server error: " + err.Error()})
+		return
+	}
+
 }
 
 func DeleteBox(c *gin.Context) {
@@ -92,7 +170,7 @@ func Updatebox(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body" + err.Error()})
 	}
 
-	var box Model.Clothe
+	var box Model.Box
 
 	if err := c.ShouldBindJSON(&box); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body" + err.Error()})

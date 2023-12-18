@@ -3,39 +3,16 @@ package main
 import (
 	"os"
 
-	MongoDB "example/src/DB/MongoDB"
 	BasicClient "example/src/handlers/Client/Basic"
 	ParcialClient "example/src/handlers/Client/Parcial"
+	User "example/src/handlers/User"
+	"example/src/initializers"
+	"example/src/middleware"
 	"fmt"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
-// The init function will run before our main function to establish a connection to MongoDB.
-const uri = "mongodb://dolphin:10deagostO@192.168.0.130:27017"
-
-func ConfigMongoConnection() {
-	fmt.Print("------------Connection to MongoDB------------:\n ")
-	fmt.Print(uri + "\n")
-
-	if err := MongoDB.Connect_to_mongodb(uri); err != nil {
-		log.Fatal("Could not connect to MongoDB\n" + err.Error())
-	}
-	dt := MongoDB.MongoClient.Database("Confecciones")
-
-	//Clientes
-	BasicClient.ClientCol = dt.Collection("clients")
-	BasicClient.ParcialCol = dt.Collection("PartialClients")
-	ParcialClient.Collection = dt.Collection("PartialClients")
-	//IntegralClient.Collection = dt.Collection("integralClients")
-
-	//Prendas
-
-	//Diseños
-
-	//Facturacion
-}
 func verifyOutput() {
 	//Verificar si os.Stdout está conectado a una terminal
 	if fi, err := os.Stdout.Stat(); err == nil {
@@ -52,7 +29,8 @@ func verifyOutput() {
 }
 func init() {
 	verifyOutput()
-	ConfigMongoConnection()
+	initializers.LoadEnvVariables()
+	initializers.ConfigMongoConnection()
 }
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -91,7 +69,11 @@ func main() {
 		c.String(200, "Healthy")
 	})
 
-	//Basic Client Info
+	//User
+	goGroup.POST("/user", User.SignUp)
+	goGroup.POST("/login", User.Login)
+	goGroup.GET("/validate", middleware.RequireAuth, User.Validate)
+	//Basic Client
 	goGroup.GET("/clients", BasicClient.GetClients)
 	goGroup.POST("/clients", BasicClient.CreateClient)
 	goGroup.PATCH("/clients", BasicClient.ChangeRating)
@@ -99,14 +81,18 @@ func main() {
 	goGroup.PUT("/clients/:id", BasicClient.UpdateClient)
 	goGroup.DELETE("/clients/:id", BasicClient.DeleteById)
 
-	//Parcial Client
+	//Partial Client
 	goGroup.GET("/parcials", ParcialClient.GetPartials)
 	goGroup.GET("/parcials/find/:id", ParcialClient.GetPartialById)
 	goGroup.POST("/parcials", ParcialClient.CreateParcial)
 	goGroup.DELETE("/parcials/:id", ParcialClient.DeleteById)
 
+	//Partial BOXES
 	goGroup.POST("/parcials/Box/:id", ParcialClient.CreateBox)
 	goGroup.DELETE("/parcials/Box", ParcialClient.DeleteBox)
 	goGroup.PUT("/parcials/Box", ParcialClient.Updatebox)
+	goGroup.POST("/parcials/Box/Image", ParcialClient.AddImage)
+	goGroup.DELETE("/parcials/Box/Image", ParcialClient.DeleteImage)
+
 	router.Run(host)
 }

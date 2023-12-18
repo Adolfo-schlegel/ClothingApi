@@ -79,7 +79,6 @@ func CreateParcial(c *gin.Context) {
 	}
 
 	// Set a new ObjectID for the client
-
 	client.ID = primitive.NewObjectID()
 
 	//Insert the client into the database
@@ -90,9 +89,7 @@ func CreateParcial(c *gin.Context) {
 		return
 	}
 
-	//Al crearse devuelve el _id y no el id
-
-	c.IndentedJSON(http.StatusCreated, 1)
+	c.IndentedJSON(http.StatusCreated, client.ID)
 }
 func DeleteById(c *gin.Context) {
 

@@ -4,6 +4,7 @@ import (
 	Model "example/src/Models"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -83,6 +84,10 @@ func GetClients(c *gin.Context) {
 		results = append(results, result)
 	}
 
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Rating > results[j].Rating
+	})
+
 	c.IndentedJSON(http.StatusOK, results)
 }
 
@@ -113,7 +118,7 @@ func CreateClient(c *gin.Context) {
 		// Setting default partial client
 		parcial.ID = primitive.NewObjectID()
 		parcial.IdClient = client.ID
-		parcial.Clothes = []Model.Clothe{}
+		parcial.Boxes = []Model.Box{}
 
 		//Insert the partial client into the database
 		_, err := ParcialCol.InsertOne(c, parcial)
@@ -130,9 +135,7 @@ func CreateClient(c *gin.Context) {
 		//??
 	}
 
-	//fijarse que onda con el id insertado
-
-	c.IndentedJSON(http.StatusCreated, 1)
+	c.IndentedJSON(http.StatusCreated, client.ID)
 }
 
 func DeleteById(c *gin.Context) {
