@@ -4,6 +4,7 @@ import (
 	"os"
 
 	BasicClient "example/src/handlers/Client/Basic"
+	BasicOrder "example/src/handlers/Client/Order"
 	ParcialClient "example/src/handlers/Client/Parcial"
 	User "example/src/handlers/User"
 	"example/src/initializers"
@@ -48,6 +49,9 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 func main() {
+	//production mode
+	//host := "192.168.0.130:9990"
+
 	host := "localhost:9990"
 	router := gin.Default()
 	router.Use(CORSMiddleware())
@@ -73,6 +77,7 @@ func main() {
 	goGroup.POST("/user", User.SignUp)
 	goGroup.POST("/login", User.Login)
 	goGroup.GET("/validate", middleware.RequireAuth, User.Validate)
+
 	//Basic Client
 	goGroup.GET("/clients", BasicClient.GetClients)
 	goGroup.POST("/clients", BasicClient.CreateClient)
@@ -94,5 +99,8 @@ func main() {
 	goGroup.POST("/parcials/Box/Image", ParcialClient.AddImage)
 	goGroup.DELETE("/parcials/Box/Image", ParcialClient.DeleteImage)
 
+	//Orders
+	goGroup.POST("/Orders/:id", BasicOrder.CreateOrder)
+	goGroup.GET("/Orders", BasicOrder.GetOrders)
 	router.Run(host)
 }

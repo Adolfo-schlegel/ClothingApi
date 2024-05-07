@@ -43,9 +43,12 @@ type Order struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id"`
 	IdClient   primitive.ObjectID `json:"idClient" bson:"idClient"`
 	NameClothe string             `json:"nameClothe" bson:"nameClothe"`
-	Waist      float32            `json:"waist" bson:"waist"`
+	Chest      string             `json:"chest" bson:"chest"`
+	Waist      string             `json:"waist" bson:"waist"`
+	Hips       string             `json:"hips" bson:"hips"`
+	ItemSize   string             `json:"itemSize" bson:"itemSize"`
 	Color      string             `json:"color" bson:"color"`
-	Embroidery string             `json:"embroidery" bson:"embroidery"`
+	Embroidery string             `json:"embroidery" bson:"embroideryImage"`
 	CostPrice  float32            `json:"costPrice" bson:"costPrice"`
 	SalePrice  float32            `json:"salePrice" bson:"salePrice"`
 }

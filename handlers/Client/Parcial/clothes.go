@@ -14,7 +14,6 @@ func CreateBox(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Error al parsear id " + err.Error()})
-
 	}
 
 	var box Model.Box
